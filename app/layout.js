@@ -1,5 +1,13 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+// app/layout.js
+
+import './globals.css';
+import 'swiper/css'; // <-- AÑADE ESTA LÍNEA
+import 'swiper/css/autoplay'; // <-- AÑADE ESTA LÍNEA
+import 'swiper/css/navigation'; // <-- AÑADE ESTA LÍNEA
+
+// ... (el resto de tu archivo layout.js)
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
