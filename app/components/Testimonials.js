@@ -51,8 +51,8 @@ export default function Testimonials() {
     <section 
       className="w-full relative bg-cover bg-center bg-fixed overflow-hidden flex flex-col justify-between pt-32 pb-24" 
       style={{ 
-        backgroundImage: "url('heroT.jpg')",
-        height: '170vh'
+        backgroundImage: "url('heroT.webp')",
+        height: '180vh'
       }}
     >
       <div className="absolute inset-0 bg-black opacity-60"></div>
@@ -80,7 +80,7 @@ export default function Testimonials() {
         viewport={{ once: true }} // (Se anima solo 1 vez)
       >
         <img 
-          src="/img/icon/granola.png" // <-- Tu nueva imagen
+          src="/img/icon/granola.webp" // <-- Tu nueva imagen
           alt="Icono Allin Runa" 
           className="w-200 h-200 opacity-80" // Tamaño de la imagen (ajusta 'w-48 h-48' como quieras)
         />
