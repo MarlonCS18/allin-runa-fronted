@@ -48,9 +48,9 @@ export default function Footer() {
         <div>
           <h5 className="text-lg font-bold text-white mb-4">Soporte</h5>
           <ul className="space-y-3">
-            <li><a href="#" className="hover:text-white transition-colors">Preguntas Frecuentes</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Políticas de Envío</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Términos de Servicio</a></li>
+            <li><a href="/preguntas-frecuentes" className="hover:text-white transition-colors">Preguntas Frecuentes</a></li>
+            <li><a href="/politicas-envio" className="hover:text-white transition-colors">Políticas de Envío</a></li>
+            <li><a href="/terminos-servicio" className="hover:text-white transition-colors">Términos de Servicio</a></li>
           </ul>
         </div>
 
