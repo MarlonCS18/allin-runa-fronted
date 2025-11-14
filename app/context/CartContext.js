@@ -2,12 +2,16 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext'; // <-- 1. IMPORTAMOS EL CONTEXTO DE AUTH
 
 const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  
+  // --- 2. OBTENEMOS EL ESTADO DE AUTENTICACIÓN ---
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
   // --- Cargar carrito desde LocalStorage (sin cambios) ---
   useEffect(() => {
@@ -24,14 +28,33 @@ export const CartProvider = ({ children }) => {
   // --- Guardar carrito en LocalStorage (sin cambios) ---
   useEffect(() => {
     try {
-      if (cart.length === 0 && !localStorage.getItem('allinRunaCart')) {
-        return; 
+      // Si el carrito está vacío, bórralo de localStorage
+      if (cart.length === 0) {
+        localStorage.removeItem('allinRunaCart');
+      } else {
+        // Si tiene algo, guárdalo
+        localStorage.setItem('allinRunaCart', JSON.stringify(cart));
       }
-      localStorage.setItem('allinRunaCart', JSON.stringify(cart));
     } catch (error) {
       console.error("Error al guardar el carrito en localStorage", error);
     }
   }, [cart]);
+
+
+  // --- ¡AQUÍ ESTÁ EL ARREGLO! ---
+  // 3. Este useEffect "escucha" los cambios en el estado de autenticación
+  useEffect(() => {
+    // Espera a que la autenticación termine de cargar
+    if (!authLoading) {
+      // Si el usuario NO está autenticado...
+      if (!isAuthenticated) {
+        // ...limpia el carrito.
+        setCart([]);
+      }
+    }
+  }, [isAuthenticated, authLoading]); // Se ejecuta cada vez que el estado de auth cambia
+  // --- FIN DEL ARREGLO ---
+
 
   // --- Función de Añadir (con control de stock) ---
   const addToCart = (product, quantityToAdd) => {

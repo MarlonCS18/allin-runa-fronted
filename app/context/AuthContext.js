@@ -16,7 +16,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // --- 1. Verificar sesión (Sin cambios) ---
+  // --- 1. Verificar sesión (¡MODIFICADO!) ---
+  // Ahora devuelve el usuario o null
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
@@ -26,12 +27,15 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const userData = await res.json();
         setUser(userData);
+        return userData; // <-- ARREGLO: Devolver datos del usuario
       } else {
         setUser(null);
+        return null; // <-- ARREGLO: Devolver null
       }
     } catch (error) {
       console.error("Error verificando auth:", error);
       setUser(null);
+      return null; // <-- ARREGLO: Devolver null
     } finally {
       setLoading(false);
     }
@@ -48,46 +52,38 @@ export const AuthProvider = ({ children }) => {
     formData.append('password', password);
 
     try {
-      const res = await fetch(LOGIN_URL, {
+      // Intento de login
+      await fetch(LOGIN_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formData.toString(),
         credentials: 'include',
-        // ¡IMPORTANTE! No seguimos las redirecciones automáticamente
         redirect: 'manual' 
       });
 
-      // --- LÓGICA DE DETECCIÓN DE LOGIN (CORREGIDA) ---
-      
-      // Si el tipo de respuesta es 'opaqueredirect', significa que el login
-      // fue exitoso (cross-origin) y el backend nos dio una cookie de sesión.
-      if (res.type === 'opaqueredirect' || res.status === 200 || (res.status === 0 && res.ok === false)) {
-        // (res.status === 0 es un truco para CORS en modo 'manual')
-        
-        // El login fue exitoso, ahora verificamos quiénes somos
-        await checkAuthStatus();
-        return { success: true };
-      }
-      
-      // Si el backend nos redirige a /login?error (tipo 'basic' o 'cors')
-      if (res.status === 302 && res.headers.get('Location')?.includes('/login?error')) {
-         return { success: false, error: 'Credenciales incorrectas' };
-      }
+      // --- ARREGLO: LÓGICA DE DETECCIÓN DE LOGIN (CORREGIDA) ---
+      // No importa la respuesta del fetch (será opaca),
+      // volvemos a verificar el estado de la autenticación.
+      // Si checkAuthStatus() devuelve un usuario, ¡el login fue exitoso!
+      const userData = await checkAuthStatus();
 
-      // Cualquier otro error
-      return { success: false, error: 'Credenciales incorrectas' };
+      if (userData) {
+        return { success: true };
+      } else {
+        // Si no hay datos de usuario, el login falló.
+        return { success: false, error: 'Credenciales incorrectas' };
+      }
 
     } catch (error) {
-      // Si hay un error de red (ej. backend apagado)
-      if (error.message === 'Failed to fetch') {
-          // A veces 'failed to fetch' es un login exitoso (por CORS y redirect)
-          // Así que asumimos que sí y verificamos.
-          await checkAuthStatus();
-          return { success: true };
+      // Esto puede saltar por el 'redirect: manual' incluso en un login exitoso.
+      // Así que volvemos a verificar el estado.
+      const userData = await checkAuthStatus();
+      if (userData) {
+        return { success: true };
       }
-      return { success: false, error: 'Error de red al iniciar sesión' };
+      return { success: false, error: 'Credenciales incorrectas o error de red' };
     }
   };
 
@@ -124,6 +120,9 @@ export const AuthProvider = ({ children }) => {
       console.error("Error en logout:", error);
     } finally {
       setUser(null);
+      // ¡OJO! El borrado del carrito se hace en los componentes
+      // (Header.js y perfil/page.js) porque este contexto
+      // no puede acceder al CartContext.
       router.push('/');
     }
   };

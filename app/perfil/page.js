@@ -3,10 +3,12 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext'; // <-- 1. IMPORTAR useCart
 import { UserCircleIcon } from '@heroicons/react/24/solid';
 
 export default function PerfilPage() {
   const { user, isAuthenticated, loading, logout } = useAuth();
+  const { clearCart } = useCart(); // <-- 2. OBTENER clearCart
   const router = useRouter();
 
   // --- Proteger la Ruta ---
@@ -24,6 +26,12 @@ export default function PerfilPage() {
       </div>
     );
   }
+
+  // --- 3. FUNCIÓN DE LOGOUT PERSONALIZADA ---
+  const handleLogout = () => {
+    clearCart(); // Limpiar el carrito
+    logout();    // Cerrar la sesión del usuario
+  };
 
   return (
     <div className="bg-gray-50 min-h-[calc(100vh-200px)] py-20">
@@ -87,10 +95,10 @@ export default function PerfilPage() {
           </form>
         </div>
 
-        {/* Sección Cerrar Sesión */}
+        {/* --- 4. BOTÓN DE CERRAR SESIÓN ACTUALIZADO --- */}
         <div className="mt-8 text-center">
             <button
-                onClick={logout}
+                onClick={handleLogout} // <-- Usar la nueva función
                 className="text-red-600 hover:text-red-800 font-medium"
             >
                 Cerrar Sesión

@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Contextos ---
-import { useCart } from '../context/CartContext';
+import { useCart } from '../context/CartContext'; // <-- ¡IMPORTADO!
 import { useAuth } from '../context/AuthContext'; 
 
 // --- Íconos ---
@@ -30,7 +30,7 @@ export default function Header() {
   const profileMenuRef = useRef(null); 
 
   // --- OBTENER ESTADO DE AUTH Y CARRITO ---
-  const { cart } = useCart();
+  const { cart, clearCart } = useCart(); // <-- ¡AÑADIMOS clearCart!
   const { user, isAuthenticated, loading, logout } = useAuth(); 
 
   // Calcular total de items (sin cambios)
@@ -91,9 +91,6 @@ export default function Header() {
           {/* Navegación Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => {
-              // --- ¡LÓGICA DE LINK ACTIVO CORREGIDA! ---
-              // Esto asegura que "Inicio" (/) solo esté activo en la homepage exacta,
-              // mientras que "Tienda" (/tienda) esté activo en /tienda, /tienda/producto/1, etc.
               const isActive = link.href === '/' 
                 ? pathname === '/' 
                 : pathname.startsWith(link.href);
@@ -103,7 +100,7 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   className={`font-medium transition-colors ${linkClass} ${
-                    isActive ? 'text-green-600' : '' // Usamos la nueva variable 'isActive'
+                    isActive ? 'text-green-600' : ''
                   }`}
                 >
                   {link.label}
@@ -125,7 +122,7 @@ export default function Header() {
               )}
             </Link>
 
-            {/* --- BLOQUE DE AUTH DINÁMICO (DESKTOP) (Sin cambios) --- */}
+            {/* --- BLOQUE DE AUTH DINÁMICO (DESKTOP) --- */}
             <div className="flex items-center gap-4">
               {loading ? (
                 <div className="h-6 w-24 bg-gray-200 rounded-md animate-pulse"></div>
@@ -163,8 +160,11 @@ export default function Header() {
                               onClick={() => setIsProfileMenuOpen(false)}>
                           Mis Pedidos
                         </Link>
+                        
+                        {/* --- ARREGLO CARRITO (DESKTOP) --- */}
                         <button
                           onClick={() => {
+                            clearCart(); // <-- ¡ARREGLO AQUÍ!
                             logout();
                             setIsProfileMenuOpen(false);
                           }}
@@ -173,6 +173,7 @@ export default function Header() {
                           <ArrowRightOnRectangleIcon className="w-5 h-5 mr-2"/>
                           Cerrar Sesión
                         </button>
+                        
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -236,7 +237,6 @@ export default function Header() {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {/* Links de Navegación */}
               {navLinks.map((link) => {
-                // --- ¡LÓGICA DE LINK ACTIVO CORREGIDA (MÓVIL)! ---
                 const isActive = link.href === '/' 
                   ? pathname === '/' 
                   : pathname.startsWith(link.href);
@@ -247,7 +247,7 @@ export default function Header() {
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`block px-3 py-2 rounded-md text-base font-medium ${
-                      isActive ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100' // Usamos 'isActive'
+                      isActive ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100'
                     }`}
                   >
                     {link.label}
@@ -256,7 +256,7 @@ export default function Header() {
               })}
 
               <div className="border-t border-gray-200 pt-3 mt-3">
-                {/* Lógica de Auth en Móvil (sin cambios) */}
+                {/* Lógica de Auth en Móvil */}
                 {loading ? (
                   <div className="block px-3 py-2 rounded-md text-base font-medium text-gray-500">
                     Cargando...
@@ -278,8 +278,11 @@ export default function Header() {
                     >
                       Mis Pedidos
                     </Link>
+                    
+                    {/* --- ARREGLO CARRITO (MÓVIL) --- */}
                     <button
                       onClick={() => {
+                        clearCart(); // <-- ¡ARREGLO AQUÍ!
                         logout();
                         setIsMobileMenuOpen(false);
                       }}
@@ -287,6 +290,7 @@ export default function Header() {
                     >
                       Cerrar Sesión
                     </button>
+                    
                   </>
                 ) : (
                   // --- B. SI ES VISITANTE (MÓVIL) ---
