@@ -1,7 +1,7 @@
 // app/components/TiendaContenido.js
 "use client"; 
 
-import React, { useState, useEffect, useMemo } from 'react'; // Importamos useMemo
+import React, { useState, useEffect, useMemo } from 'react'; 
 import Image from 'next/image';
 import Link from 'next/link'; 
 import { motion } from 'framer-motion';
@@ -10,9 +10,10 @@ import { motion } from 'framer-motion';
 import ProductCard, { fadeInUp } from './ProductCard';
 import FilterGroup from './FilterGroup';
 
-// Definimos las animaciones
+// Definimos las categorías
 const categories = ["Superfoods", "Despensa Saludable", "Bienestar", "Cuidado Personal"];
 
+// Animaciones
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
@@ -24,32 +25,37 @@ const staggerContainer = {
   }
 };
 
-export default function TiendaContenido({ allProducts }) {
+export default function TiendaContenido({ allProducts, initialCategory = 'Todos' }) {
   
   // --- ESTADOS DE FILTROS ---
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  
+  // 1. Categorías: Si viene una categoría inicial (y no es 'Todos'), la ponemos en el array.
+  // Si es 'Todos', empezamos con array vacío (que significa "sin filtro de categoría").
+  const [selectedCategories, setSelectedCategories] = useState(
+    initialCategory && initialCategory !== 'Todos' ? [initialCategory] : []
+  );
+
   const [sortOrder, setSortOrder] = useState('popularidad');
   const [filteredProducts, setFilteredProducts] = useState(allProducts); 
 
-  // --- NUEVOS ESTADOS PARA LOS FILTROS ---
+  // --- OTROS ESTADOS ---
   const [searchTerm, setSearchTerm] = useState('');
   const [showInStock, setShowInStock] = useState(false);
-  const [minPrice, setMinPrice] = useState(''); // Usamos string para permitir inputs vacíos
-  const [maxPrice, setMaxPrice] = useState(''); // Usamos string para permitir inputs vacíos
+  const [minPrice, setMinPrice] = useState(''); 
+  const [maxPrice, setMaxPrice] = useState(''); 
 
-  // Calculamos el precio máximo posible para usarlo en el placeholder del filtro
+  // Calculamos precio máximo para el placeholder
   const maxPossiblePrice = useMemo(() => {
-    if (!allProducts || allProducts.length === 0) return 100; // Default
-    // Usamos Math.ceil para redondear hacia arriba
+    if (!allProducts || allProducts.length === 0) return 100; 
     return Math.ceil(Math.max(...allProducts.map(p => p.precio))); 
   }, [allProducts]);
 
 
-  // --- LÓGICA DE FILTROS ACTUALIZADA ---
+  // --- LÓGICA DE FILTROS PRINCIPAL ---
   useEffect(() => {
     let products = [...allProducts];
 
-    // 1. Filtro por Búsqueda (Nombre)
+    // 1. Filtro por Búsqueda
     if (searchTerm) {
       products = products.filter(p => 
         p.nombre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -62,11 +68,12 @@ export default function TiendaContenido({ allProducts }) {
     }
 
     // 3. Filtro por Categoría
+    // Si hay categorías seleccionadas, filtramos. Si el array está vacío, mostramos todo.
     if (selectedCategories.length > 0) {
       products = products.filter(p => selectedCategories.includes(p.categoria));
     }
 
-    // 4. Filtro por Rango de Precio
+    // 4. Filtro por Precio
     const numMinPrice = parseFloat(minPrice);
     const numMaxPrice = parseFloat(maxPrice);
 
@@ -77,7 +84,7 @@ export default function TiendaContenido({ allProducts }) {
       products = products.filter(p => p.precio <= numMaxPrice);
     }
     
-    // 5. Lógica de Ordenamiento (YA CORREGIDA)
+    // 5. Ordenamiento
     switch (sortOrder) {
       case 'precio-asc':
         products.sort((a, b) => parseFloat(a.precio) - parseFloat(b.precio));
@@ -94,16 +101,16 @@ export default function TiendaContenido({ allProducts }) {
     }
     
     setFilteredProducts(products);
-  }, [selectedCategories, sortOrder, allProducts, searchTerm, showInStock, minPrice, maxPrice]); // <-- Dependencias actualizadas
+  }, [selectedCategories, sortOrder, allProducts, searchTerm, showInStock, minPrice, maxPrice]);
 
-  // Funciones de manejo de filtros
+  // Manejo de checkbox de categorías
   const handleCategoryChange = (category) => {
     setSelectedCategories(prev =>
       prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
     );
   };
 
-  // --- NUEVA FUNCIÓN PARA LIMPIAR TODOS LOS FILTROS ---
+  // Limpiar filtros
   const clearAllFilters = () => {
     setSelectedCategories([]);
     setSearchTerm('');
@@ -111,17 +118,19 @@ export default function TiendaContenido({ allProducts }) {
     setMinPrice('');
     setMaxPrice('');
     setSortOrder('popularidad');
+    // Opcional: Limpiar la URL si quieres que se vea limpia
+    window.history.replaceState(null, '', '/tienda');
   };
 
   return (
     <>
-      {/* --- SECCIÓN 1: HERO DE TIENDA (Sin cambios) --- */}
+      {/* --- HERO --- */}
       <section className="relative w-full h-[50vh] flex items-center justify-center text-center text-white -mt-16">
         <Image
           src="/img/tienda-hero.webp"
           alt="Productos orgánicos en una mesa"
           fill={true}
-          className="brightness-50 object-cover" // Propiedades modernas de Next/Image
+          className="brightness-50 object-cover"
           priority
         />
         <motion.div 
@@ -139,10 +148,10 @@ export default function TiendaContenido({ allProducts }) {
         </motion.div>
       </section>
 
-      {/* --- SECCIÓN 2: CUERPO PRINCIPAL (Filtros + Cuadrícula) --- */}
+      {/* --- CUERPO PRINCIPAL --- */}
       <div className="w-full max-w-full mx-auto py-16 px-4 md:px-8 lg:px-12 flex flex-col lg:flex-row gap-10">
         
-        {/* --- COLUMNA IZQUIERDA: Filtros (Sidebar) --- CON CAMBIOS --- */}
+        {/* SIDEBAR DE FILTROS */}
         <motion.aside 
           className="w-full lg:w-1/4 xl:w-1/5 bg-white p-6 rounded-lg shadow-lg self-start sticky top-24"
           variants={fadeInUp}
@@ -152,14 +161,14 @@ export default function TiendaContenido({ allProducts }) {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Filtros</h2>
             <button 
-              onClick={clearAllFilters} // <-- Botón actualizado
+              onClick={clearAllFilters} 
               className="text-sm font-medium text-green-600 hover:text-green-800 transition-colors"
             >
               Limpiar todo
             </button>
           </div>
           
-          {/* --- NUEVO: FILTRO DE BÚSQUEDA --- */}
+          {/* Filtro de Búsqueda */}
           <div className="mb-6">
             <label htmlFor="search" className="block text-lg font-semibold text-gray-800 mb-2">Buscar</label>
             <input
@@ -172,7 +181,7 @@ export default function TiendaContenido({ allProducts }) {
             />
           </div>
 
-          {/* --- FILTRO DE CATEGORÍA (Existente) --- */}
+          {/* Filtro de Categoría */}
           <FilterGroup
             title="Categoría"
             options={categories}
@@ -180,7 +189,7 @@ export default function TiendaContenido({ allProducts }) {
             onChange={handleCategoryChange}
           />
           
-          {/* --- NUEVO: FILTRO DE RANGO DE PRECIO --- */}
+          {/* Filtro de Precio */}
           <div className="mt-6 border-t pt-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Precio (S/.)</h3>
             <div className="flex gap-3 items-center">
@@ -204,7 +213,7 @@ export default function TiendaContenido({ allProducts }) {
             </div>
           </div>
 
-          {/* --- NUEVO: FILTRO DE DISPONIBILIDAD (STOCK) --- */}
+          {/* Filtro de Stock */}
           <div className="mt-6 border-t pt-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">Disponibilidad</h3>
             <div className="flex items-center gap-3">
@@ -223,11 +232,10 @@ export default function TiendaContenido({ allProducts }) {
           
         </motion.aside>
 
-        {/* COLUMNA DERECHA: Productos */}
+        {/* LISTA DE PRODUCTOS */}
         <main className="w-full lg:w-3/4 xl:w-4/5">
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <p className="text-sm text-gray-600 w-full md:w-auto">
-              {/* --- NUEVO: Mensaje dinámico --- */}
               {filteredProducts.length > 0
                 ? `Mostrando ${filteredProducts.length} productos`
                 : `No se encontraron productos`
@@ -247,12 +255,11 @@ export default function TiendaContenido({ allProducts }) {
           
           <motion.div 
             className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6"
-            key={filteredProducts.length}
+            key={filteredProducts.length} // Clave para reiniciar animación al filtrar
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
           >
-            {/* --- NUEVO: Mensaje si no hay productos --- */}
             {filteredProducts.length === 0 && (
               <div className="col-span-full text-center py-10">
                 <p className="text-gray-600">No se encontraron productos que coincidan con tus filtros.</p>
@@ -264,7 +271,7 @@ export default function TiendaContenido({ allProducts }) {
                 </button>
               </div>
             )}
-            {/* Mapeo de productos */}
+            
             {filteredProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -272,7 +279,7 @@ export default function TiendaContenido({ allProducts }) {
         </main>
       </div>
 
-      {/* --- SECCIÓN 3: CTA (Newsletter) (Sin cambios) --- */}
+      {/* CTA SECTION */}
       <section className="w-full bg-gray-100 py-24 text-center">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-4xl font-bold mb-6">Únete a la Comunidad Allin Runa</h2>

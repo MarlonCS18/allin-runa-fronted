@@ -52,7 +52,7 @@ export default function Testimonials() {
       className="w-full relative bg-cover bg-center bg-fixed overflow-hidden flex flex-col justify-between pt-32 pb-24" 
       style={{ 
         backgroundImage: "url('heroT.webp')",
-        height: '180vh'
+        height: '200vh'
       }}
     >
       <div className="absolute inset-0 bg-black opacity-60"></div>

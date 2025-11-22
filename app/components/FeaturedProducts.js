@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link'; // Importamos Link
 
 // --- Variantes de Animación (Sin cambios) ---
 const gridVariants = {
@@ -29,12 +30,12 @@ const textVariant = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' }}
 };
 
-// --- CAMBIO 1: Aceptamos 'title', 'subtitle', y 'layout' ---
+// --- Componente Principal ---
 export default function FeaturedProducts({ productos, title, subtitle, layout }) {
   
   const BACKEND_URL = 'http://localhost:8080';
 
-  // --- CAMBIO 2: Lógica para definir la clase de la cuadrícula ---
+  // --- Lógica para definir la clase de la cuadrícula ---
   // Por defecto, usará 4 columnas (para tu página principal)
   let gridClass = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8";
 
@@ -42,7 +43,6 @@ export default function FeaturedProducts({ productos, title, subtitle, layout })
   if (layout === '3-col') {
     gridClass = "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8";
   }
-  // -----------------------------------------------------------
 
   return (
     <section className="w-full bg-stone-100 py-20"> 
@@ -55,18 +55,18 @@ export default function FeaturedProducts({ productos, title, subtitle, layout })
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {/* Títulos dinámicos (sin cambios) */}
+          {/* Títulos dinámicos */}
           <h2 className="text-4xl font-bold mb-4 text-gray-900">
             {title || "Selección del Mes"}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12">
-            {subtitle || "Productos orgánicos traídos desde tu API de Java."}
+            {subtitle || "Descubre nuestra selección exclusiva de productos 100% orgánicos y naturales, cultivados con dedicación para tu bienestar."}
           </p>
         </motion.div>
         
-        {/* --- CAMBIO 3: Usamos la variable gridClass --- */}
+        {/* --- Grid de Productos --- */}
         <motion.div 
-          className={gridClass} // <-- ¡AQUÍ ESTÁ EL CAMBIO!
+          className={gridClass} 
           variants={gridVariants}
           initial="hidden"
           whileInView="visible"
@@ -74,7 +74,7 @@ export default function FeaturedProducts({ productos, title, subtitle, layout })
         >
           {productos.map((producto) => {
             
-            // Lógica de URL (sin cambios)
+            // Lógica de URL
             let imageUrl;
             if (producto.imagen) {
               if (producto.imagen.startsWith('http://') || producto.imagen.startsWith('https://')) {
@@ -91,18 +91,33 @@ export default function FeaturedProducts({ productos, title, subtitle, layout })
                 key={producto.id}
                 variants={cardVariant}
               >
-                {/* Lógica interna de la tarjeta (sin cambios) */}
-                <div className="border bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 h-full flex flex-col">
-                  <img src={imageUrl} alt={producto.nombre} className="w-full h-56 object-cover" />
+                {/* --- CAMBIO AQUÍ: Envolvemos la tarjeta con Link --- */}
+                <Link href={`/producto/${producto.id}`} className="block h-full">
                   
-                  <div className="p-5 flex flex-col flex-grow">
-                    <h3 className="text-xl font-semibold">{producto.nombre}</h3>
+                  {/* Lógica interna de la tarjeta */}
+                  <div className="border bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-105 h-full flex flex-col cursor-pointer group">
                     
-                    <p className="text-2xl font-bold text-green-700 mt-auto pt-2">
-                      S/ {producto.precio.toFixed(2)}
-                    </p>
+                    <div className="relative overflow-hidden w-full h-56">
+                        <img 
+                            src={imageUrl} 
+                            alt={producto.nombre} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                        />
+                    </div>
+                    
+                    <div className="p-5 flex flex-col flex-grow">
+                      <h3 className="text-xl font-semibold text-gray-800 group-hover:text-green-600 transition-colors">
+                        {producto.nombre}
+                      </h3>
+                      
+                      <p className="text-2xl font-bold text-green-700 mt-auto pt-2">
+                        S/ {producto.precio.toFixed(2)}
+                      </p>
+                    </div>
                   </div>
-                </div>
+
+                </Link>
+                {/* --- FIN DEL CAMBIO --- */}
               </motion.div>
             );
           })}

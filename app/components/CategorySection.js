@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link'; // <--- IMPORTANTE: Usar Link de Next.js
 
 // --- (Variantes de Animación - sin cambios) ---
 const gridVariants = {
@@ -26,10 +27,10 @@ const cardVariant = {
 
 export default function CategorySection({ categories }) {
   return (
-    // ¡CAMBIO 1: FONDO "VERDE OLIVA OSCURO"!
+
     <section className="w-full bg-emerald-950 py-20">
       
-      {/* ¡CAMBIO 2: TEXTO CLARO! */}
+      
       <div className="text-center mb-16 px-4">
         <h2 className="text-5xl font-extrabold mb-4 text-white">Explora por Categoría</h2>
         <p className="text-lg text-gray-300 max-w-2xl mx-auto">
@@ -49,8 +50,12 @@ export default function CategorySection({ categories }) {
             key={category.name}
             variants={cardVariant}
           >
-            <a 
-              href="/tienda" 
+            {/* CAMBIO PRINCIPAL: 
+                1. Usamos <Link> en lugar de <a> para navegación SPA.
+                2. Pasamos la categoría como query param: ?category=Nombre 
+            */}
+            <Link 
+              href={`/tienda?category=${encodeURIComponent(category.name)}`} 
               className="relative h-80 rounded-lg overflow-hidden shadow-lg group block"
             >
               <img
@@ -62,7 +67,7 @@ export default function CategorySection({ categories }) {
               <h3 className="absolute inset-0 flex items-center justify-center text-white text-2xl font-bold p-4 text-center">
                 {category.name}
               </h3>
-            </a>
+            </Link>
           </motion.div>
         ))}
       </motion.div>
