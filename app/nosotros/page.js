@@ -56,7 +56,7 @@ const regionsData = [
   {
     id: "costa",
     regionName: "Costa",
-    backgroundImage: "/img/producers/costa-hero.jpg", 
+    backgroundImage: "/img/producers/costa-hero.webp", 
     description: "Bañada por el sol y bendecida por las corrientes del Pacífico, la Costa es una tierra de contrastes. Aquí, valles fértiles florecen en medio del desierto, dándonos productos de sabor intenso. Honramos este ecosistema único, trabajando con agricultores que combinan sabiduría ancestral y uso responsable del agua para crear verdadera calidad.",
     products: [
       { name: "Pescado Seco", img: "/img/products/pescado-seco.webp" },
@@ -67,7 +67,7 @@ const regionsData = [
   {
     id: "sierra",
     regionName: "Sierra",
-    backgroundImage: "/img/producers/sierra-hero.jpg", 
+    backgroundImage: "/img/producers/sierra-hero.webp", 
     description: "Donde el cielo toca la tierra. A más de 3,000 metros, el aire es puro y el sol intenso. En este escenario majestuoso crecen los superalimentos más potentes del mundo. Nuestros socios en la Sierra no solo cultivan quinua y maca; custodian un legado ancestral, respetando los ciclos de la Pachamama para garantizar una potencia nutricional inigualable.",
     products: [
       { name: "Quinua Orgánica", img: "/img/products/quinua.webp" },
@@ -78,7 +78,7 @@ const regionsData = [
   {
     id: "selva", 
     regionName: "Selva",
-    backgroundImage: "/img/producers/selva-hero.jpg", 
+    backgroundImage: "/img/producers/selva-hero.webp", 
     description: "El corazón vibrante del planeta. La Amazonía es una sinfonía de biodiversidad, un tesoro de vida exuberante. De esta tierra generosa, y en colaboración directa con agricultores locales, obtenemos cacao puro, café de especialidad y frutos exóticos. Nuestro modelo de comercio justo asegura que cada producto que disfrutas también ayuda a proteger esta maravilla natural.",
     products: [
       { name: "Cacao Puro", img: "/img/products/cacao.webp" },
